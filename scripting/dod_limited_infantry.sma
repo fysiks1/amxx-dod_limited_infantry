@@ -23,7 +23,6 @@ public plugin_init()
 	RegisterHam(Ham_Spawn, "player", "hookHamSpawn", 1)
 	register_event("DeathMsg","eventDeathMsg","a")
 	register_event("HLTV", "hookNewRound", "a", "1=0", "2=0")
-	register_logevent("hookRoundEnd", 2, "1=Round_End")
 
 	g_pCvarEnable = register_cvar("limited_infantry_enable", "0")
 	g_pCvarInfantryCount = register_cvar("limited_infantry_count", "5")
@@ -88,16 +87,6 @@ public hookNewRound()
 	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
 	client_print(0, print_chat, "New Round!") // Debug
 }
-
-public hookRoundEnd()
-{
-	if( !get_pcvar_num(g_pCvarEnable) )
-		return
-
-	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
-	client_print(0, print_chat, "Round End!") // Debug
-}
-
 
 triggerWin(iTeam)
 {
