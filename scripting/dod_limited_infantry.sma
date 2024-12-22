@@ -20,7 +20,6 @@ public plugin_init()
 
 	register_concmd("infantry_count", "cmdInfantryCount")
 
-	RegisterHam(Ham_Spawn, "player", "hookHamSpawn", 1)
 	register_event("DeathMsg","eventDeathMsg","a")
 	register_event("HLTV", "hookNewRound", "a", "1=0", "2=0")
 
@@ -33,14 +32,17 @@ public plugin_init()
 		set_fail_state("dod_control_point_master not found")
 
 	// Find 2 'dod_score_ent' entities - Fail if less (based on dod_killingspree by Vet(3TT3V))
-	new ent, last_ent, szTargetname[32]
+	new ent, last_ent, iTeam
 	for( ent = 0; ent < 2; ent++ )
 	{
-		last_ent = fm_find_ent_by_class(last_ent, CLASS_SCORES) // TO DO:  Figure out which dod_score_ent is for which team
-		g_entScore[ent] = last_ent
-		
-		if( !g_entScore[ent] )
+		last_ent = fm_find_ent_by_class(last_ent, CLASS_SCORES)
+		iTeam = pev(last_ent, pev_team)
+
+		if( !last_ent || !iTeam )
 			set_fail_state("Two dod_score_ent entities were not found")
+
+		g_entScore[iTeam - 1] = last_ent
+		
 	}
 }
 
@@ -77,8 +79,6 @@ public eventDeathMsg()
 			}
 		}
 	}
-
-	client_print(0, print_chat, "Death.  %d:%d", g_iInfantryCount[ALLIES], g_iInfantryCount[AXIS]) // Debug
 }
 
 public hookNewRound()
@@ -87,7 +87,6 @@ public hookNewRound()
 		return
 
 	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
-	client_print(0, print_chat, "New Round!") // Debug
 }
 
 triggerWin(iTeam)
@@ -99,6 +98,7 @@ triggerWin(iTeam)
 
 public cmdInfantryCount(id)
 {
-	console_print(id, "Allies: %d   Axis: %d", g_iInfantryCount[ALLIES], g_iInfantryCount[AXIS])
+	new iMax = get_pcvar_num(g_pCvarInfantryCount)
+	console_print(id, "Allies: %d/%d   Axis: %d/%d", g_iInfantryCount[ALLIES], iMax, g_iInfantryCount[AXIS], iMax)
 	return PLUGIN_HANDLED
 }
