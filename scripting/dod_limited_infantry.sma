@@ -2,57 +2,48 @@
 #include <hamsandwich>
 #include <dodconst>
 
-new g_iSpawnCount[4]
+new g_iInfantryCount[4]
 
-new g_pCvarSpawnCount
+new g_pCvarInfantryCount, g_pCvarEnable
 
 public plugin_init()
 {
 	register_plugin("DOD Limited Infantry", "0.1", "Fysiks")
+
+	register_concmd("infantry_count", "cmdInfantryCount")
+
 	RegisterHam(Ham_Spawn, "player", "hookHamSpawn", 1)
 	register_event("DeathMsg","eventDeathMsg","a")
-	// need to hook new round for hookNewRound()
+	register_event("HLTV", "hookNewRound", "a", "1=0", "2=0")
+	register_logevent("hookRoundEnd", 2, "1=Round_End")
 
-	g_pCvarSpawnCount = register_cvar("limited_infantry_spawn_count", "50")
+	g_pCvarEnable = register_cvar("limited_infantry_enable", "0")
+	g_pCvarInfantryCount = register_cvar("limited_infantry_count", "5")
 }
 
 public hookHamSpawn(id)
 {
-	if( is_user_alive(id) )
-	{
-		new iTeam = get_user_team(id)
-		switch( iTeam )
-		{
-			case 1, 2:
-			{
-				g_iSpawnCount[iTeam]++
-				client_print(0, print_chat, "Spawn Count: %d %d", g_iSpawnCount[ALLIES], g_iSpawnCount[AXIS])
-			}
-		}
-	}
 }
 
 public eventDeathMsg()
 {
+	if( !get_pcvar_num(g_pCvarEnable) )
+		return
+	
 	new id = read_data(2);
 	new iTeam = get_user_team(id)
-	new iSpawnCount
 
 	switch( iTeam )
 	{
 		case 1, 2:
 		{
-			iSpawnCount = g_iSpawnCount[iTeam]
+			g_iInfantryCount[iTeam]++
 		}
 	}
 
-
-	if( iSpawnCount >= get_pcvar_num(g_pCvarSpawnCount) )
+	if( g_iInfantryCount[iTeam] >= get_pcvar_num(g_pCvarInfantryCount) )
 	{
-		// Block spawning for team
-		blockTeamSpawn(iTeam)
-		
-		// If last player, trigger end of round
+		// Limit reached, trigger end of round
 		new iPlayers[32], iPlayersNum
 
 		switch( iTeam )
@@ -67,24 +58,37 @@ public eventDeathMsg()
 			}
 		}
 	}
+
+	client_print(0, print_chat, "Death.  %d:%d", g_iInfantryCount[ALLIES], g_iInfantryCount[AXIS]) // Debug
 }
 
 public hookNewRound()
 {
-	arrayset(g_iSpawnCount, 0, sizeof g_iSpawnCount)
-	client_print(0, print_chat, "New Round!")
+	if( !get_pcvar_num(g_pCvarEnable) )
+		return
+
+	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
+	client_print(0, print_chat, "New Round!") // Debug
+}
+
+public hookRoundEnd()
+{
+	if( !get_pcvar_num(g_pCvarEnable) )
+		return
+
+	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
+	client_print(0, print_chat, "Round End!") // Debug
 }
 
 
 triggerWin(iTeam)
 {
 	// trigger win
-	client_print(0, print_chat, "Trigger Win for %s", iTeam == ALLIES ? "Allies" : "Axis")
+	client_print(0, print_chat, "Infantry ran out for %s", iTeam == AXIS ? "Allies" : "Axis") // Debug
 }
 
-blockTeamSpawn(iTeam)
+public cmdInfantryCount(id)
 {
-	// block team spawn
-	client_print(0, print_chat, "Block Spawn for %s", iTeam == ALLIES ? "Allies" : "Axis")
+	console_print(id, "Allies: %d   Axis: %d", g_iInfantryCount[ALLIES], g_iInfantryCount[AXIS])
+	return PLUGIN_HANDLED
 }
-
