@@ -29,15 +29,17 @@ public plugin_init()
 
 	// Find the 'dod_control_point_master' entity (based on dod_killingspree by Vet(3TT3V))
 	g_entControlPointMaster = fm_find_ent_by_class(g_entControlPointMaster, CLASS_MASTER)
-	if (!g_entControlPointMaster)
+	if( !g_entControlPointMaster )
 		set_fail_state("dod_control_point_master not found")
 
 	// Find 2 'dod_score_ent' entities - Fail if less (based on dod_killingspree by Vet(3TT3V))
-	new ent, last_ent
-	for (ent = 0; ent < 2; ent++) {
-		g_entScore[ent] = fm_find_ent_by_class(last_ent, CLASS_SCORES) // TO DO:  Figure out which dod_score_ent is for which team
-		last_ent = g_entScore[ent]
-		if (!g_entScore[ent])
+	new ent, last_ent, szTargetname[32]
+	for( ent = 0; ent < 2; ent++ )
+	{
+		last_ent = fm_find_ent_by_class(last_ent, CLASS_SCORES) // TO DO:  Figure out which dod_score_ent is for which team
+		g_entScore[ent] = last_ent
+		
+		if( !g_entScore[ent] )
 			set_fail_state("Two dod_score_ent entities were not found")
 	}
 }
