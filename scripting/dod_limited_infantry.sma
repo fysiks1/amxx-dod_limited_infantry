@@ -84,7 +84,7 @@ public hookRoundEnd()
 triggerWin(iTeam)
 {
 	// trigger win
-	client_print(0, print_chat, "Infantry ran out for %s", iTeam == AXIS ? "Allies" : "Axis") // Debug
+	client_print(0, print_chat, "%s have lost due to a lack of backup infantry.", iTeam == ALLIES ? "Allies" : "Axis") // Debug
 }
 
 public cmdInfantryCount(id)
