@@ -13,6 +13,7 @@ new g_iInfantryCount[4]
 new g_pCvarInfantryCount, g_pCvarEnable
 new g_entControlPointMaster
 new g_entScore[2]
+new g_entWinSound[2]
 
 public plugin_init()
 {
@@ -32,11 +33,24 @@ public plugin_init()
 		set_fail_state("dod_control_point_master not found")
 
 	// Find 2 'dod_score_ent' entities - Fail if less (based on dod_killingspree by Vet(3TT3V))
-	new ent, last_ent, iTeam
+	new ent, last_ent, iTeam, szScoreTargetname[32], ent2, szSoundTargetname[32]
 	for( ent = 0; ent < 2; ent++ )
 	{
 		last_ent = fm_find_ent_by_class(last_ent, CLASS_SCORES)
 		iTeam = pev(last_ent, pev_team)
+
+		pev(last_ent, pev_targetname, szScoreTargetname, charsmax(szScoreTargetname))
+		ent2 = 0
+		while( (ent2 = fm_find_ent_by_class(ent2, "ambient_generic")) )
+		{
+			pev(ent2, pev_targetname, szSoundTargetname, charsmax(szSoundTargetname))
+			if( equal(szScoreTargetname, szSoundTargetname) )
+			{
+				// Win sound, presumably, assuming only one sound is played per win
+				g_entWinSound[iTeam - 1] = ent2
+				break
+			}
+		}
 
 		if( !last_ent || !iTeam )
 			set_fail_state("Two dod_score_ent entities were not found")
@@ -91,9 +105,16 @@ public hookNewRound()
 
 triggerWin(iTeam)
 {
-	// trigger win
+	// Trigger dod_score_ent for winning team
 	client_print(0, print_chat, "%s have lost due to a lack of backup infantry.", iTeam == ALLIES ? "Allies" : "Axis") // Debug
 	ExecuteHamB(Ham_Use, g_entScore[iTeam == ALLIES ? 0 : 1], g_entControlPointMaster, g_entControlPointMaster, 3, NEVER)
+
+	// Play win sound
+	new entWinSound = g_entWinSound[iTeam == ALLIES ? 0 : 1]
+	if( pev_valid(entWinSound) )
+	{
+		ExecuteHamB(Ham_Use, entWinSound, g_entControlPointMaster, g_entControlPointMaster, 3, NEVER)
+	}
 }
 
 public cmdInfantryCount(id)
