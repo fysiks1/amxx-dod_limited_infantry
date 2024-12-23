@@ -14,6 +14,7 @@ new g_pCvarInfantryCount, g_pCvarEnable
 new g_entControlPointMaster
 new g_entScore[2]
 new g_entWinSound[2]
+new bool:g_bInPlay, g_iSpawnCount
 
 public plugin_init()
 {
@@ -21,6 +22,7 @@ public plugin_init()
 
 	register_concmd("infantry_count", "cmdInfantryCount")
 
+	RegisterHam(Ham_Spawn, "player", "hookHamSpawn", 1)
 	register_event("DeathMsg","eventDeathMsg","a")
 	register_event("HLTV", "hookNewRound", "a", "1=0", "2=0")
 
@@ -57,6 +59,14 @@ public plugin_init()
 
 		g_entScore[iTeam - 1] = last_ent
 		
+	}
+}
+
+public hookHamSpawn(id)
+{
+	if( is_user_alive(id) )
+	{
+		client_print(0, print_chat, "Number of Spawns: %d", ++g_iSpawnCount)
 	}
 }
 
@@ -97,9 +107,6 @@ public eventDeathMsg()
 
 public hookNewRound()
 {
-	if( !get_pcvar_num(g_pCvarEnable) )
-		return
-
 	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
 }
 
