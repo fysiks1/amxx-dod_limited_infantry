@@ -8,13 +8,12 @@
 #define CLASS_SCORES "dod_score_ent"
 #define NEVER 0.0
 
-new g_iInfantryCount[4]
+new g_iDeathCount[4]
 
 new g_pCvarInfantryCount, g_pCvarEnable
 new g_entControlPointMaster
 new g_entScore[2]
 new g_entWinSound[2]
-new bool:g_bInPlay, g_iSpawnCount
 
 public plugin_init()
 {
@@ -66,7 +65,6 @@ public hookHamSpawn(id)
 {
 	if( is_user_alive(id) )
 	{
-		client_print(0, print_chat, "Number of Spawns: %d", ++g_iSpawnCount)
 	}
 }
 
@@ -82,11 +80,11 @@ public eventDeathMsg()
 	{
 		case 1, 2:
 		{
-			g_iInfantryCount[iTeam]++
+			g_iDeathCount[iTeam]++
 		}
 	}
 
-	if( g_iInfantryCount[iTeam] >= get_pcvar_num(g_pCvarInfantryCount) )
+	if( g_iDeathCount[iTeam] >= get_pcvar_num(g_pCvarInfantryCount) )
 	{
 		// Limit reached, trigger end of round
 		new iPlayers[32], iPlayersNum
@@ -107,7 +105,7 @@ public eventDeathMsg()
 
 public hookNewRound()
 {
-	arrayset(g_iInfantryCount, 0, sizeof g_iInfantryCount)
+	arrayset(g_iDeathCount, 0, sizeof g_iDeathCount)
 }
 
 triggerWin(iTeam)
@@ -127,6 +125,6 @@ triggerWin(iTeam)
 public cmdInfantryCount(id)
 {
 	new iMax = get_pcvar_num(g_pCvarInfantryCount)
-	console_print(id, "Allies: %d/%d   Axis: %d/%d", g_iInfantryCount[ALLIES], iMax, g_iInfantryCount[AXIS], iMax)
+	console_print(id, "Allies: %d/%d   Axis: %d/%d", g_iDeathCount[ALLIES], iMax, g_iDeathCount[AXIS], iMax)
 	return PLUGIN_HANDLED
 }
