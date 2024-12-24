@@ -9,6 +9,7 @@
 #define NEVER 0.0
 
 new g_iDeathCount[4]
+new bool:g_bInfantryDepleted[4]
 
 new g_pCvarInfantryCount, g_pCvarEnable
 new g_entControlPointMaster
@@ -21,7 +22,7 @@ public plugin_init()
 
 	register_concmd("infantry_count", "cmdInfantryCount")
 
-	RegisterHam(Ham_Spawn, "player", "hookHamSpawn", 1)
+	RegisterHam(Ham_Spawn, "player", "hookHamSpawnPre", 0)
 	register_event("DeathMsg","eventDeathMsg","a")
 	register_event("HLTV", "hookNewRound", "a", "1=0", "2=0")
 
@@ -61,11 +62,17 @@ public plugin_init()
 	}
 }
 
-public hookHamSpawn(id)
+public hookHamSpawnPre(id)
 {
-	if( is_user_alive(id) )
+	if( is_user_connected(id) )
 	{
+		new iTeam = get_user_team(id)
+		if( g_bInfantryDepleted[iTeam] )
+		{
+			return HAM_SUPERCEDE
+		}
 	}
+	return HAM_IGNORED
 }
 
 public eventDeathMsg()
@@ -89,6 +96,8 @@ public eventDeathMsg()
 		// Limit reached, trigger end of round
 		new iPlayers[32], iPlayersNum
 
+		g_bInfantryDepleted[iTeam] = true
+
 		switch( iTeam )
 		{
 			case 1, 2:
@@ -106,6 +115,7 @@ public eventDeathMsg()
 public hookNewRound()
 {
 	arrayset(g_iDeathCount, 0, sizeof g_iDeathCount)
+	arrayset(g_bInfantryDepleted, 0, sizeof g_bInfantryDepleted)
 }
 
 triggerWin(iTeam)
