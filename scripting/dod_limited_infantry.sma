@@ -125,7 +125,7 @@ public hookNewRound()
 triggerWin(iTeam)
 {
 	// Trigger dod_score_ent for winning team
-	client_print(0, print_chat, "%s have lost due to a lack of backup infantry.", iTeam == ALLIES ? "Allies" : "Axis") // Debug
+	client_print(0, print_chat, "%s have lost due to a lack of backup infantry.", iTeam == AXIS ? "Allies" : "Axis")
 	ExecuteHamB(Ham_Use, g_entScore[iTeam == ALLIES ? 0 : 1], g_entControlPointMaster, g_entControlPointMaster, 3, NEVER)
 
 	// Play win sound
