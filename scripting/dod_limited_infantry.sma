@@ -18,7 +18,7 @@ new g_entWinSound[2]
 
 public plugin_init()
 {
-	register_plugin("DOD Limited Infantry", "0.1", "Fysiks")
+	register_plugin("DOD Limited Infantry", "0.2", "Fysiks")
 
 	register_concmd("infantry_count", "cmdInfantryCount")
 
@@ -109,6 +109,10 @@ public eventDeathMsg()
 				}
 			}
 		}
+	}
+	else
+	{
+		client_print(0, print_chat, "Backup infantrymen remaining for %s: %d", iTeam == ALLIES ? "Allies" : "Axis", get_pcvar_num(g_pCvarInfantryCount) - g_iDeathCount[iTeam])
 	}
 }
 
