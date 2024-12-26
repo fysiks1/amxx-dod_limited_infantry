@@ -22,7 +22,7 @@ public plugin_init()
 
 	register_concmd("infantry_count", "cmdInfantryCount")
 
-	RegisterHam(Ham_Spawn, "player", "hookHamSpawnPre", 0)
+	RegisterHam(Ham_Spawn, "player", "hookHamSpawnPre", 0, true)
 	register_event("DeathMsg","eventDeathMsg","a")
 	register_event("HLTV", "hookNewRound", "a", "1=0", "2=0")
 
