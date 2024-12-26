@@ -94,16 +94,13 @@ public eventDeathMsg()
 	if( g_iDeathCount[iTeam] >= get_pcvar_num(g_pCvarInfantryCount) )
 	{
 		// Limit reached, trigger end of round
-		new iPlayers[32], iPlayersNum
-
 		g_bInfantryDepleted[iTeam] = true
 
 		switch( iTeam )
 		{
 			case 1, 2:
 			{
-				get_players(iPlayers, iPlayersNum, "e", iTeam == 1 ? "Allies" : "Axis")
-				if( iPlayersNum == 0 )
+				if( get_players_alive_team(iTeam) == 0 )
 				{
 					triggerWin(iTeam == ALLIES ? AXIS : ALLIES)
 				}
@@ -146,4 +143,21 @@ public cmdInfantryCount(id)
 public plugin_cfg()
 {
 	set_pcvar_num(g_pCvarEnable, 0)
+}
+
+stock get_players_alive_team(iTeam)
+{
+	static iPlayers[32], iPlayersNum, i, iCount
+	get_players(iPlayers, iPlayersNum, "a")
+	
+	iCount = 0
+	for( i = 0; i < iPlayersNum; i++ )
+	{
+		if( get_user_team(iPlayers[i]) == iTeam )
+		{
+			iCount++
+		}
+	}
+
+	return iCount
 }
