@@ -142,3 +142,8 @@ public cmdInfantryCount(id)
 	console_print(id, "Allies: %d/%d   Axis: %d/%d", g_iDeathCount[ALLIES], iMax, g_iDeathCount[AXIS], iMax)
 	return PLUGIN_HANDLED
 }
+
+public plugin_cfg()
+{
+	set_pcvar_num(g_pCvarEnable, 0)
+}
