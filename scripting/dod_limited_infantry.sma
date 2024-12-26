@@ -18,7 +18,7 @@ new g_entWinSound[2]
 
 public plugin_init()
 {
-	register_plugin("DOD Limited Infantry", "0.2", "Fysiks")
+	register_plugin("DOD Limited Infantry", "0.3", "Fysiks")
 
 	register_concmd("infantry_count", "cmdInfantryCount")
 
