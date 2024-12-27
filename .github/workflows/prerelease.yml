@@ -63,5 +63,7 @@ jobs:
         with:
           prerelease: true
           fail_on_unmatched_files: true
+          body: |
+            Beta Release
           files: ./plugin_binaries/*.amxx
 
